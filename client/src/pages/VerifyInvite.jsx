@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Toast from '../components/Toast';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -8,75 +9,77 @@ const VerifyInvite = () => {
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
     const navigate = useNavigate();
+
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [status, setStatus] = useState('idle'); // idle, loading, success, error
-    const [message, setMessage] = useState('');
+    const [toast, setToast] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {
-            setMessage('Passwords do not match');
+            setToast({ message: 'Passwords do not match', type: 'error' });
             return;
         }
 
-        setStatus('loading');
+        setIsLoading(true);
         try {
-            const res = await axios.post(`${API_URL}/api/auth/verify-invite`, {
-                token,
-                newPassword: password
-            });
-            setStatus('success');
-            setMessage(res.data.message);
-            setTimeout(() => navigate('/login'), 3000);
+            await axios.post(`${API_URL}/api/auth/verify-invite`, { token, newPassword: password });
+            setToast({ message: 'Account verified successfully! Redirecting to login...', type: 'success' });
+            setTimeout(() => navigate('/login'), 2000);
         } catch (error) {
-            setStatus('error');
-            setMessage(error.response?.data?.message || 'Verification failed');
+            setToast({ message: error.response?.data?.message || 'Verification failed', type: 'error' });
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    if (!token) return <div style={{ padding: '50px', textAlign: 'center' }}>Invalid invite link.</div>;
+    if (!token) {
+        return (
+            <div className="auth-container">
+                <div className="auth-box">
+                    <h2>Invalid Link</h2>
+                    <p>The verification link is invalid or missing.</p>
+                    <button onClick={() => navigate('/login')} className="btn btn-primary">Go to Login</button>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div style={{ maxWidth: '400px', margin: '50px auto', padding: '30px', background: 'white', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Complete Registration</h2>
-            {status === 'success' ? (
-                <div style={{ color: 'green', textAlign: 'center' }}>
-                    {message}
-                    <p>Redirecting to login...</p>
-                </div>
-            ) : (
+        <div className="auth-container">
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+            <div className="auth-box">
+                <h2>Welcome to ZuruSasa</h2>
+                <p style={{ marginBottom: '20px', color: '#718096' }}>Please set your password to activate your account.</p>
                 <form onSubmit={handleSubmit}>
-                    <div style={{ marginBottom: '15px' }}>
+                    <div className="form-group">
                         <label>New Password</label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}
+                            placeholder="Enter new password"
+                            minLength="6"
                         />
                     </div>
-                    <div style={{ marginBottom: '20px' }}>
+                    <div className="form-group">
                         <label>Confirm Password</label>
                         <input
                             type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
-                            style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}
+                            placeholder="Confirm new password"
+                            minLength="6"
                         />
                     </div>
-                    {message && <p style={{ color: 'red', marginBottom: '15px' }}>{message}</p>}
-                    <button
-                        type="submit"
-                        disabled={status === 'loading'}
-                        style={{ width: '100%', padding: '12px', background: '#3182ce', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
-                    >
-                        {status === 'loading' ? 'Verifying...' : 'Set Password & Login'}
+                    <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={isLoading}>
+                        {isLoading ? 'Activating...' : 'Activate Account'}
                     </button>
                 </form>
-            )}
+            </div>
         </div>
     );
 };

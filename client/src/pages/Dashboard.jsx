@@ -17,6 +17,7 @@ const Dashboard = () => {
     const [editingReel, setEditingReel] = useState(null);
     const [analytics, setAnalytics] = useState({ totalViews: 0, totalReels: 0, topReels: [] });
     const [teamMembers, setTeamMembers] = useState([]);
+    const [notifications, setNotifications] = useState([]);
     const [verification, setVerification] = useState({ status: 'loading', feedback: '' });
     const [settings, setSettings] = useState({ username: '', bio: '', phone_number: '' });
     const [managedAccounts, setManagedAccounts] = useState([]);
@@ -39,6 +40,7 @@ const Dashboard = () => {
         if (activeTab === 'reels') fetchMyReels();
         if (activeTab === 'analytics') fetchAnalytics();
         if (activeTab === 'team') fetchTeamMembers();
+        if (activeTab === 'notifications') fetchNotifications();
         if (activeTab === 'settings') fetchSettings();
     }, [activeTab, currentHostId]);
 
@@ -124,6 +126,28 @@ const Dashboard = () => {
                 bio: res.data.bio || '',
                 phone_number: res.data.phone_number || ''
             });
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchTeamMembers = async () => {
+        try {
+            const res = await axios.get(`${API_URL}/api/team`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            });
+            setTeamMembers(res.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchNotifications = async () => {
+        try {
+            const res = await axios.get(`${API_URL}/api/notifications`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            });
+            setNotifications(res.data);
         } catch (error) {
             console.error(error);
         }
@@ -296,6 +320,12 @@ const Dashboard = () => {
                         Team
                     </button>
                 )}
+                <button
+                    className={`btn ${activeTab === 'notifications' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setActiveTab('notifications')}
+                >
+                    Notifications
+                </button>
                 <button
                     className={`btn ${activeTab === 'settings' ? 'btn-primary' : 'btn-secondary'}`}
                     onClick={() => setActiveTab('settings')}
@@ -538,6 +568,31 @@ const Dashboard = () => {
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            )}
+
+            {activeTab === 'notifications' && (
+                <div className="glass-panel">
+                    <h3>Notifications</h3>
+                    <div className="notifications-list">
+                        {notifications.length === 0 ? (
+                            <p>No notifications yet.</p>
+                        ) : (
+                            notifications.map(notif => (
+                                <div key={notif.id} style={{
+                                    padding: '15px',
+                                    borderBottom: '1px solid rgba(0,0,0,0.05)',
+                                    background: notif.is_read ? 'transparent' : 'rgba(255, 0, 80, 0.05)',
+                                    borderLeft: notif.is_read ? 'none' : '3px solid var(--primary-color)',
+                                    marginBottom: '10px',
+                                    borderRadius: '4px'
+                                }}>
+                                    <p style={{ margin: '0 0 5px 0' }}>{notif.message}</p>
+                                    <small style={{ color: '#718096' }}>{new Date(notif.created_at).toLocaleString()}</small>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             )}

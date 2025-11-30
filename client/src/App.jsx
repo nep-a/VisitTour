@@ -29,7 +29,11 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+
+            {/* Protected Routes */}
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/verify-email/:token" element={<VerifyEmail />} />
             <Route path="/verify-invite" element={<VerifyInvite />} />
@@ -49,7 +53,7 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/admin" element={
-              <ProtectedRoute roles={['admin']}>
+              <ProtectedRoute roles={['admin', 'sales', 'marketing']}>
                 <AdminDashboard />
               </ProtectedRoute>
             } />

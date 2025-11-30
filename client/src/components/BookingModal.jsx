@@ -42,7 +42,7 @@ const BookingModal = ({ reel, onClose }) => {
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content">
+            <div className="modal-content booking-modal">
                 <button className="close-btn" onClick={onClose}><FaTimes /></button>
                 <h2>Book {reel.title}</h2>
                 <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--primary-color)' }}>

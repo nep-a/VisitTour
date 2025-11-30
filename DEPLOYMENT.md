@@ -1,6 +1,6 @@
-# Deployment Guide for VisitTours
+# Deployment Guide for ZuruSasa
 
-This guide outlines the steps to deploy the VisitTours application. The application consists of a React frontend (Client) and a Node.js/Express backend (Server) with a MySQL database.
+This guide outlines the steps to deploy the ZuruSasa application. The application consists of a React frontend (Client) and a Node.js/Express backend (Server) with a MySQL database.
 
 ## Prerequisites
 
@@ -49,7 +49,7 @@ We will deploy the Node.js server.
         -   `DB_PASS`: Your database password.
         -   `DB_NAME`: Your database name.
         -   `JWT_SECRET`: A strong secret key for authentication.
-        -   `CLIENT_URL`: The URL of your deployed frontend (you will get this in Step 3, e.g., `https://visittours.vercel.app`). For now, you can set it to `*` or update it later.
+        -   `CLIENT_URL`: The URL of your deployed frontend (you will get this in Step 3, e.g., `https://zurusasa.vercel.app`). For now, you can set it to `*` or update it later.
         -   `PORT`: `5000` (or let Render assign one).
 
 ### Option B: Deploying to Railway
@@ -73,7 +73,7 @@ We will deploy the React Vite app.
     -   **Framework Preset**: Vite
     -   **Root Directory**: `client`
 5.  **Environment Variables**:
-    -   `VITE_API_URL`: The URL of your deployed backend (from Step 2, e.g., `https://visittours-backend.onrender.com`). **Important**: Do not add a trailing slash.
+    -   `VITE_API_URL`: The URL of your deployed backend (from Step 2, e.g., `https://zurusasa-backend.onrender.com`). **Important**: Do not add a trailing slash.
 6.  **Deploy**.
 
 ### Handling Client-Side Routing

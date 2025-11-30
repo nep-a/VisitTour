@@ -17,7 +17,7 @@ const Navbar = () => {
     return (
         <nav>
             <Link to="/" style={{ textDecoration: 'none' }}>
-                <h1>VisitTours</h1>
+                <h1>ZuruSasa</h1>
             </Link>
             <ul>
                 {user ? (
@@ -38,16 +38,9 @@ const Navbar = () => {
 
                         {/* Admin Links */}
                         {user.role === 'admin' && (
-                            <>
-                                <li>
-                                    <Link to="/upload" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '8px 16px' }}>
-                                        <FaPlus /> <span className="nav-text">Upload</span>
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link to="/admin" className="nav-link" style={{ color: '#e53e3e', fontWeight: 'bold' }}>Admin Panel</Link>
-                                </li>
-                            </>
+                            <li>
+                                <Link to="/admin" className="nav-link" style={{ color: '#e53e3e', fontWeight: 'bold' }}>Admin Panel</Link>
+                            </li>
                         )}
 
                         {/* Sales/Marketing Links */}

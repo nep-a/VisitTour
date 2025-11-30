@@ -1,4 +1,4 @@
-# VisitTours - Tourism Reels Marketplace
+# ZuruSasa - Tourism Reels Marketplace
 
 A full-stack tourism marketplace based on short video reels.
 

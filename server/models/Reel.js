@@ -41,6 +41,10 @@ const Reel = sequelize.define('Reel', {
         type: DataTypes.INTEGER,
         defaultValue: 0,
     },
+    likes_count: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    }
 }, {
     tableName: 'reels',
     timestamps: true,

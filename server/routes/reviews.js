@@ -12,6 +12,10 @@ router.post('/', verifyToken, async (req, res) => {
     try {
         const { booking_id, rating, comment } = req.body;
 
+        if (!booking_id) {
+            return res.status(400).json({ message: 'Booking ID is required.' });
+        }
+
         // 1. Find the booking
         const booking = await Booking.findOne({
             where: { id: booking_id, user_id: req.userId },
@@ -19,7 +23,7 @@ router.post('/', verifyToken, async (req, res) => {
         });
 
         if (!booking) {
-            return res.status(404).json({ message: 'Booking not found or not authorized.' });
+            return res.status(404).json({ message: 'Booking not found or not authorized. You can only review reels you have booked.' });
         }
 
         // 2. Check if booking is completed

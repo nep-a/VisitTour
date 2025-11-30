@@ -1,77 +1,80 @@
 import { useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useNotification } from '../context/NotificationContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const ResetPassword = () => {
-    const { token } = useParams();
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const [password, setPassword] = useState('');
+    const { showNotification } = useNotification();
+    const token = searchParams.get('token');
+
+    const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (password !== confirmPassword) {
-            return setError("Passwords do not match");
+        if (newPassword !== confirmPassword) {
+            showNotification('Passwords do not match', 'error');
+            return;
         }
-
         setLoading(true);
-        setError('');
-        setMessage('');
-
         try {
-            const res = await axios.post(`${API_URL}/api/auth/reset-password`, { token, newPassword: password });
-            setMessage(res.data.message);
-            setTimeout(() => navigate('/login'), 3000);
-        } catch (err) {
-            setError(err.response?.data?.message || 'Invalid or expired token');
+            await axios.post(`${API_URL}/api/auth/reset-password`, { token, newPassword });
+            showNotification('Password reset successfully! Please login.', 'success');
+            navigate('/login');
+        } catch (error) {
+            showNotification(error.response?.data?.message || 'Failed to reset password', 'error');
         } finally {
             setLoading(false);
         }
     };
 
-    return (
-        <div className="auth-container">
-            <div className="glass-panel auth-form">
-                <h2 style={{ textAlign: 'center' }}>New Password</h2>
-
-                {message && <div className="alert alert-success">{message}</div>}
-                {error && <div className="alert alert-danger">{error}</div>}
-
-                {!message && (
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        <div className="form-group">
-                            <input
-                                type="password"
-                                placeholder="New Password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                minLength={6}
-                            />
-                        </div>
-                        <div className="form-group">
-                            <input
-                                type="password"
-                                placeholder="Confirm New Password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <button type="submit" className="btn btn-primary" disabled={loading}>
-                            {loading ? 'Resetting...' : 'Set New Password'}
-                        </button>
-                    </form>
-                )}
-
-                <div style={{ textAlign: 'center', marginTop: '15px' }}>
-                    <Link to="/login" style={{ color: 'var(--primary-color)', textDecoration: 'none' }}>Back to Login</Link>
+    if (!token) {
+        return (
+            <div className="container" style={{ marginTop: '100px', textAlign: 'center' }}>
+                <div className="glass-panel">
+                    <h2 style={{ color: '#f56565' }}>Invalid Link</h2>
+                    <p>This password reset link is invalid or missing.</p>
+                    <button onClick={() => navigate('/login')} className="btn btn-primary">Go to Login</button>
                 </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="container" style={{ marginTop: '100px', display: 'flex', justifyContent: 'center' }}>
+            <div className="glass-panel" style={{ width: '100%', maxWidth: '400px' }}>
+                <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Reset Password</h2>
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label>New Password</label>
+                        <input
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            required
+                            placeholder="Enter new password"
+                            minLength={6}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Confirm Password</label>
+                        <input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                            placeholder="Confirm new password"
+                        />
+                    </div>
+                    <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
+                        {loading ? 'Resetting...' : 'Reset Password'}
+                    </button>
+                </form>
             </div>
         </div>
     );

@@ -38,12 +38,16 @@ const Booking = sequelize.define('Booking', {
             model: 'users',
             key: 'id'
         }
+    },
+    deleted_by_traveler: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
 }, {
     tableName: 'bookings',
     timestamps: true,
     createdAt: 'created_at',
-    updatedAt: false,
+    updatedAt: 'updated_at',
 });
 
 Booking.belongsTo(User, { as: 'Traveler', foreignKey: 'user_id' });

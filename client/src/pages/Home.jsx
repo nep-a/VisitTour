@@ -58,6 +58,14 @@ const Home = () => {
         fetchReels(1, true);
     }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    // Toggle mobile view class
+    useEffect(() => {
+        document.body.classList.add('mobile-reels-view');
+        return () => {
+            document.body.classList.remove('mobile-reels-view');
+        };
+    }, []);
+
     // Infinite scroll
     useEffect(() => {
         const handleScroll = () => {

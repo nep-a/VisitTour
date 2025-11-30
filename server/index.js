@@ -27,6 +27,7 @@ app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/team', require('./routes/team'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/verification', require('./routes/verification'));
+app.use('/api/notifications', require('./routes/notifications'));
 
 // Database Sync and Start Server
 sequelize.ensureDbExists().then(() => {

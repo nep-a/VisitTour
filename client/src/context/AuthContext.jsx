@@ -26,7 +26,11 @@ export const AuthProvider = ({ children }) => {
             setUser(res.data.user);
             return { success: true };
         } catch (error) {
-            return { success: false, message: error.response?.data?.message || 'Login failed' };
+            return {
+                success: false,
+                message: error.response?.data?.message || 'Login failed',
+                isUnverified: error.response?.data?.isUnverified
+            };
         }
     };
 

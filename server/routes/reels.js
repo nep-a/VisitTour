@@ -5,6 +5,7 @@ const { Op } = require('sequelize');
 const Reel = require('../models/Reel');
 const User = require('../models/User');
 const TeamMember = require('../models/TeamMember');
+const Like = require('../models/Like');
 const verifyToken = require('../middleware/auth');
 
 const moderationService = require('../services/moderationService');
@@ -135,6 +136,51 @@ router.post('/:id/view', async (req, res) => {
     }
 });
 
+// Toggle Like
+router.post('/:id/like', verifyToken, async (req, res) => {
+    try {
+        const reelId = req.params.id;
+        const userId = req.userId;
+
+        const reel = await Reel.findByPk(reelId);
+        if (!reel) return res.status(404).json({ message: 'Reel not found' });
+
+        const existingLike = await Like.findOne({
+            where: { reel_id: reelId, user_id: userId }
+        });
+
+        if (existingLike) {
+            await existingLike.destroy();
+            reel.likes_count = Math.max(0, reel.likes_count - 1);
+            await reel.save();
+            return res.json({ message: 'Unliked', likes_count: reel.likes_count, liked: false });
+        } else {
+            await Like.create({ reel_id: reelId, user_id: userId });
+            reel.likes_count += 1;
+            await reel.save();
+            return res.json({ message: 'Liked', likes_count: reel.likes_count, liked: true });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Check if user liked reel
+router.get('/:id/is-liked', verifyToken, async (req, res) => {
+    try {
+        const reelId = req.params.id;
+        const userId = req.userId;
+
+        const like = await Like.findOne({
+            where: { reel_id: reelId, user_id: userId }
+        });
+
+        res.json({ liked: !!like });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Host Analytics
 router.get('/host/analytics', verifyToken, async (req, res) => {
     try {
@@ -150,14 +196,16 @@ router.get('/host/analytics', verifyToken, async (req, res) => {
 
         const reels = await Reel.findAll({
             where: { host_id: targetHostId },
-            attributes: ['id', 'title', 'views', 'created_at']
+            attributes: ['id', 'title', 'views', 'likes_count', 'created_at']
         });
 
         const totalViews = reels.reduce((sum, reel) => sum + reel.views, 0);
+        const totalLikes = reels.reduce((sum, reel) => sum + reel.likes_count, 0);
         const topReels = [...reels].sort((a, b) => b.views - a.views).slice(0, 5);
 
         res.json({
             totalViews,
+            totalLikes,
             totalReels: reels.length,
             topReels
         });

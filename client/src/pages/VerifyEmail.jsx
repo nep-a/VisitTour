@@ -1,53 +1,61 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useNotification } from '../context/NotificationContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const VerifyEmail = () => {
-    const { token } = useParams();
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const [status, setStatus] = useState('verifying'); // verifying, success, error
-    const [message, setMessage] = useState('');
+    const { showNotification } = useNotification();
+    const [status, setStatus] = useState('verifying');
+    const token = searchParams.get('token');
 
     useEffect(() => {
+        if (!token) {
+            setStatus('error');
+            return;
+        }
+
         const verify = async () => {
             try {
-                const res = await axios.post(`${API_URL}/api/auth/verify-email`, { token });
+                await axios.post(`${API_URL}/api/auth/verify-email`, { token });
                 setStatus('success');
-                setMessage(res.data.message);
+                showNotification('Email verified successfully!', 'success');
                 setTimeout(() => navigate('/login'), 3000);
             } catch (error) {
+                console.error(error);
                 setStatus('error');
-                setMessage(error.response?.data?.message || 'Verification failed.');
+                showNotification(error.response?.data?.message || 'Verification failed', 'error');
             }
         };
-        if (token) verify();
-    }, [token, navigate]);
+
+        verify();
+    }, [token, navigate, showNotification]);
 
     return (
-        <div className="auth-container">
-            <div className="glass-panel auth-form" style={{ textAlign: 'center' }}>
-                <h2>Email Verification</h2>
-
-                {status === 'verifying' && <p>Verifying your email...</p>}
-
-                {status === 'success' && (
-                    <div className="alert alert-success">
-                        <h3>✅ Verified!</h3>
-                        <p>{message}</p>
-                        <p>Redirecting to login...</p>
-                    </div>
+        <div className="container" style={{ marginTop: '100px', textAlign: 'center' }}>
+            <div className="glass-panel" style={{ maxWidth: '400px', margin: '0 auto' }}>
+                {status === 'verifying' && (
+                    <>
+                        <h2>Verifying Email...</h2>
+                        <p>Please wait while we verify your email address.</p>
+                    </>
                 )}
-
+                {status === 'success' && (
+                    <>
+                        <h2 style={{ color: '#48bb78' }}>Verified!</h2>
+                        <p>Your email has been verified successfully.</p>
+                        <p>Redirecting to login...</p>
+                    </>
+                )}
                 {status === 'error' && (
-                    <div className="alert alert-danger">
-                        <h3>❌ Verification Failed</h3>
-                        <p>{message}</p>
-                        <Link to="/login" className="btn btn-primary" style={{ marginTop: '10px', textDecoration: 'none' }}>
-                            Back to Login
-                        </Link>
-                    </div>
+                    <>
+                        <h2 style={{ color: '#f56565' }}>Verification Failed</h2>
+                        <p>The verification link is invalid or has expired.</p>
+                        <button onClick={() => navigate('/login')} className="btn btn-primary">Go to Login</button>
+                    </>
                 )}
             </div>
         </div>

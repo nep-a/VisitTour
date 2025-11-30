@@ -36,7 +36,7 @@ const Register = () => {
     return (
         <div className="auth-container">
             <div className="glass-panel auth-form">
-                <h2 style={{ textAlign: 'center' }}>Join VisitTours</h2>
+                <h2 style={{ textAlign: 'center' }}>Join ZuruSasa</h2>
                 {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
                 {success ? (
                     <div className="alert alert-success" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>

@@ -338,6 +338,15 @@ nav a:hover {
   transform: scale(0.95);
 }
 
+.action-label {
+  font-size: 0.75rem;
+  color: white;
+  text-align: center;
+  margin-top: 4px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
 /* Forms */
 .auth-container {
   display: flex;
@@ -403,27 +412,155 @@ nav a:hover {
   box-shadow: 0 0 0 4px rgba(255, 0, 80, 0.1);
 }
 
-/* Mobile Nav Adjustments */
+/* Mobile Full-Screen Reel Layout */
 @media (max-width: 768px) {
+
+  /* General Mobile Nav Adjustments (Applies to all pages) */
   nav {
-    padding: 12px 20px;
+    padding: 10px 15px;
   }
 
   nav h1 {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
   nav ul {
-    gap: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .btn {
-    padding: 8px 16px;
-    font-size: 0.9rem;
+    padding: 8px 14px;
+    font-size: 0.85rem;
   }
 
   .nav-text {
     display: none;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+  }
+
+  /* Scoped Full-Screen Styles (Only on Home/Reels page) */
+  body.mobile-reels-view {
+    overflow: hidden;
+    background-color: black;
+  }
+
+  body.mobile-reels-view nav {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+    backdrop-filter: none;
+    border: none;
+    box-shadow: none;
+    padding: 15px 20px;
+    pointer-events: none;
+  }
+
+  body.mobile-reels-view nav a,
+  body.mobile-reels-view nav h1,
+  body.mobile-reels-view nav button {
+    pointer-events: auto;
+    color: white !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  body.mobile-reels-view nav h1 {
+    background: none;
+    -webkit-text-fill-color: white;
+  }
+
+  /* Feed Container */
+  body.mobile-reels-view .feed-container {
+    height: 100vh;
+    width: 100vw;
+    padding: 0;
+    margin: 0;
+    gap: 0;
+    background-color: black;
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+
+  /* Reel Card */
+  body.mobile-reels-view .reel-card {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    margin: 0;
+    border-radius: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    position: relative;
+    box-shadow: none;
+  }
+
+  body.mobile-reels-view .reel-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Search Bar Overlay */
+  body.mobile-reels-view .glass-panel {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  /* Overlay Elements */
+  body.mobile-reels-view .reel-overlay {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
+    padding-bottom: 40px;
+    padding-left: 15px;
+    width: 100%;
+  }
+
+  body.mobile-reels-view .reel-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+  }
+
+  body.mobile-reels-view .reel-info p {
+    font-size: 0.9rem;
+    margin: 4px 0;
+  }
+
+  body.mobile-reels-view .reel-host-info {
+    top: 80px;
+    left: 15px;
+  }
+
+  body.mobile-reels-view .reel-actions {
+    right: 10px;
+    bottom: 100px;
+    gap: 25px;
+  }
+
+  body.mobile-reels-view .action-btn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+  }
+
+  body.mobile-reels-view .action-label {
+    font-size: 0.7rem;
+    color: white;
+    text-align: center;
+    margin-top: 4px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    font-weight: 600;
   }
 }
 
@@ -545,8 +682,8 @@ nav a:hover {
 .admin-container {
   display: flex;
   min-height: 100vh;
-  padding-top: 70px;
-  /* Height of Navbar */
+  padding-top: 90px;
+  /* Height of Navbar + extra space */
   background-color: var(--bg-color);
 }
 
@@ -557,7 +694,7 @@ nav a:hover {
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: 70px;
+  top: 90px;
   bottom: 0;
   left: 0;
   overflow-y: auto;
@@ -737,4 +874,129 @@ nav a:hover {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-color);
+}
+
+/* Custom Dropdown */
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+  min-width: 200px;
+  font-family: var(--font-main);
+}
+
+.dropdown-trigger {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+  color: var(--text-color);
+  font-size: 0.95rem;
+}
+
+.dropdown-trigger:hover {
+  border-color: #cbd5e0;
+  background: #f8fafc;
+}
+
+.dropdown-arrow {
+  color: #a0aec0;
+  transition: transform 0.2s;
+  font-size: 0.8rem;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-top: 4px;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+}
+
+.dropdown-search {
+  padding: 10px;
+  border-bottom: 1px solid #edf2f7;
+  position: relative;
+}
+
+.dropdown-search input {
+  width: 100%;
+  padding: 8px 8px 8px 30px;
+  border: 1px solid #edf2f7;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.dropdown-search .search-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0aec0;
+  font-size: 0.8rem;
+}
+
+.dropdown-options {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdown-option {
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.1s;
+  font-size: 0.95rem;
+  color: var(--text-color);
+}
+
+.dropdown-option:hover {
+  background: #f7fafc;
+  color: var(--primary-color);
+}
+
+.dropdown-option.selected {
+  background: #ebf8ff;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.dropdown-no-results {
+  padding: 12px;
+  text-align: center;
+  color: #a0aec0;
+  font-size: 0.9rem;
+}
+
+/* Booking Modal Specifics */
+.booking-modal {
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+}
+
+@media (max-width: 768px) {
+  .booking-modal {
+    max-height: 70vh;
+    width: 95%;
+    border-radius: 20px;
+  }
 }

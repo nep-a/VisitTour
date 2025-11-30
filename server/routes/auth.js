@@ -6,14 +6,16 @@ const crypto = require('crypto');
 const { Op } = require('sequelize');
 const router = express.Router();
 
+const emailService = require('../services/emailService');
+
 router.post('/register', async (req, res) => {
     try {
         const { username, email, password, role, hostType } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
         const emailToken = crypto.randomBytes(20).toString('hex');
 
-        // Travelers are verified by default, Hosts need verification
-        const isVerified = role === 'traveler';
+        // Enforce verification for ALL users
+        const isVerified = false;
 
         const user = await User.create({
             username,
@@ -22,25 +24,18 @@ router.post('/register', async (req, res) => {
             role: role || 'traveler',
             host_type: role === 'host' ? hostType : null,
             is_email_verified: isVerified,
-            email_verification_token: isVerified ? null : emailToken,
-            email_verification_expires: isVerified ? null : Date.now() + 86400000 // 24 hours
+            email_verification_token: emailToken,
+            email_verification_expires: Date.now() + 86400000 // 24 hours
         });
 
-        if (role === 'host') {
-            // Send verification email
-            const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-            const verifyLink = `${clientUrl}/verify-email?token=${emailToken}`;
-            console.log(`[EMAIL SENT] To: ${email}, Subject: Verify your email, Link: ${verifyLink}`);
+        // Send verification email
+        await emailService.sendVerificationEmail(email, emailToken);
 
-            res.status(201).json({
-                message: 'Registration successful. Please check your email to verify your account.',
-                token: emailToken // For demo purposes
-            });
-        } else {
-            res.status(201).json({
-                message: 'Registration successful. You can now login.',
-            });
-        }
+        res.status(201).json({
+            message: 'Registration successful. Please check your email to verify your account.',
+            token: emailToken // Keeping this for now if frontend needs it for immediate feedback, though email is better
+        });
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -52,8 +47,8 @@ router.post('/login', async (req, res) => {
         const user = await User.findOne({ where: { email } });
         if (!user) return res.status(404).json({ message: 'User not found' });
 
-        // Only enforce email verification for hosts
-        if (user.role === 'host' && !user.is_email_verified) {
+        // Enforce email verification for ALL users
+        if (!user.is_email_verified) {
             return res.status(403).json({
                 message: 'Email not verified. Please check your inbox.',
                 isUnverified: true // Flag for frontend to show resend button
@@ -78,13 +73,12 @@ router.post('/forgot-password', async (req, res) => {
 
         const token = crypto.randomBytes(20).toString('hex');
         user.reset_password_token = token;
-        user.reset_password_expires = Date.now() + 3600000; // 1 hour
+        user.reset_password_expires = Date.now() + 1800000; // 30 minutes
         await user.save();
 
-        // In a real app, send email here.
-        // For demo, we return the token.
-        console.log(`Reset Token for ${email}: ${token}`);
-        res.json({ message: 'Password reset link sent to email.', token });
+        await emailService.sendPasswordResetEmail(email, token);
+
+        res.json({ message: 'Password reset link sent to email.' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -174,9 +168,7 @@ router.post('/resend-verification', async (req, res) => {
         user.email_verification_expires = Date.now() + 86400000; // 24 hours
         await user.save();
 
-        const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-        const verifyLink = `${clientUrl}/verify-email?token=${emailToken}`;
-        console.log(`[EMAIL SENT] To: ${email}, Subject: Verify your email, Link: ${verifyLink}`);
+        await emailService.sendVerificationEmail(email, emailToken);
 
         res.json({ message: 'Verification email sent.' });
     } catch (error) {
