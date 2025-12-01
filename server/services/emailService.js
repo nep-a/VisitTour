@@ -28,7 +28,7 @@ exports.sendEmail = async (to, subject, html) => {
 };
 
 exports.sendVerificationEmail = async (to, token) => {
-    const baseUrl = process.env.CLIENT_URL || 'https://visittour.onrender.com';
+    const baseUrl = process.env.CLIENT_URL || 'https://visit-tour-yrs8.vercel.app';
     const link = `${baseUrl}/verify-email?token=${token}`;
     const html = `
         <h1>Verify Your Email</h1>
@@ -41,7 +41,7 @@ exports.sendVerificationEmail = async (to, token) => {
 };
 
 exports.sendPasswordResetEmail = async (to, token) => {
-    const baseUrl = process.env.CLIENT_URL || 'https://visittour.onrender.com';
+    const baseUrl = process.env.CLIENT_URL || 'https://visit-tour-yrs8.vercel.app';
     const link = `${baseUrl}/reset-password?token=${token}`;
     const html = `
         <h1>Reset Your Password</h1>
@@ -55,7 +55,7 @@ exports.sendPasswordResetEmail = async (to, token) => {
 };
 
 exports.sendInviteEmail = async (to, token, role) => {
-    const baseUrl = process.env.CLIENT_URL || 'https://visittour.onrender.com';
+    const baseUrl = process.env.CLIENT_URL || 'https://visit-tour-yrs8.vercel.app';
     const link = `${baseUrl}/verify-invite?token=${token}`;
     const html = `
         <h1>Welcome to ZuruSasa Team</h1>

@@ -14,7 +14,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: [process.env.CLIENT_URL || '*', 'https://visittours.onrender.com', 'https://visittour.onrender.com']
+    origin: [process.env.CLIENT_URL || '*', 'https://visittours.onrender.com', 'https://visittour.onrender.com', 'https://visit-tour-yrs8.vercel.app', 'https://visit-tour-yrs8.vercel.app/']
 }));
 app.use(express.json());
 
