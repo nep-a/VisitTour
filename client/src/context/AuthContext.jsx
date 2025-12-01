@@ -26,9 +26,13 @@ export const AuthProvider = ({ children }) => {
             setUser(res.data.user);
             return { success: true };
         } catch (error) {
+            let message = error.response?.data?.message || 'Login failed';
+            if (error.code === 'ERR_NETWORK') {
+                message = 'Network error. Please check your connection or try again later. (Possible CORS issue)';
+            }
             return {
                 success: false,
-                message: error.response?.data?.message || 'Login failed',
+                message,
                 isUnverified: error.response?.data?.isUnverified
             };
         }
@@ -39,7 +43,11 @@ export const AuthProvider = ({ children }) => {
             const res = await axios.post(`${API_URL}/api/auth/register`, { username, email, password, role, hostType });
             return { success: true, token: res.data.token };
         } catch (error) {
-            return { success: false, message: error.response?.data?.message || 'Registration failed' };
+            let message = error.response?.data?.message || 'Registration failed';
+            if (error.code === 'ERR_NETWORK') {
+                message = 'Network error. Unable to reach the server. Please check if the backend is running and accessible.';
+            }
+            return { success: false, message };
         }
     };
 
