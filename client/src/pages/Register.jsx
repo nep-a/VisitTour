@@ -42,14 +42,7 @@ const Register = () => {
                     <div className="alert alert-success" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                         <h3>Registration Successful!</h3>
                         <p>Please check your email to verify your account.</p>
-                        {demoToken && (
-                            <div style={{ marginTop: '15px', padding: '10px', background: 'rgba(255,255,255,0.5)', borderRadius: '8px', width: '100%' }}>
-                                <strong>Demo Only:</strong><br />
-                                <a href={`/verify-email/${demoToken}`} style={{ color: 'inherit', wordBreak: 'break-all' }}>
-                                    Click here to verify email
-                                </a>
-                            </div>
-                        )}
+
                         <button onClick={() => navigate('/login')} className="btn btn-secondary" style={{ marginTop: '15px' }}>
                             Go to Login
                         </button>
